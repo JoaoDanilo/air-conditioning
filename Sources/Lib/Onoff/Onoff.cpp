@@ -14,6 +14,11 @@ uint8_t Onoff::read(){
   return _button.readBit();
 }
 
-uint8_t Onoff::ledStandby(uint8_t bit){
-  _led.writeBit(bit);
+void Onoff::activeLed(){
+  _led.writeBit(0);
 }
+
+void Onoff::deactiveLed(){
+  _led.writeBit(1);
+}
+

@@ -2,6 +2,8 @@
 #define SOURCES_FREQUENCYDIVIDER_H_
 
 #include <stdint.h>
+#include <Lib/PIT/PITPeriodicInterrupt/mkl_PITPeriodicInterrupt.h>
+#include <Lib/MinuteTimer/MinuteTimer.h>
 
 /**
  * Class FrequencyDivider - Represent a frequency divider device
@@ -16,12 +18,16 @@ class FrequencyDivider{
      * Constructor class - Enter with the number of times the clock will be divided
      * @param divider Clock divider
      */
-    FrequencyDivider(uint32_t divider);
+    FrequencyDivider(uint32_t divider, PIT_ChPIT channel);
 
     /**
      * Calculates the clock division
      */
-    uint8_t clockDiv();
+    void clockDiv(MinuteTimer *timer);
+
+    void disablePit();
+
+    void enablePit();
 
   private:
 
@@ -30,6 +36,12 @@ class FrequencyDivider{
 
     /** Aux counter */
     uint32_t _counter = 1;
+
+    mkl_PITInterruptInterrupt _pit;
+
+    void clearPITFlag();
+
+    bool isPITFlag();
 };
 
 #endif

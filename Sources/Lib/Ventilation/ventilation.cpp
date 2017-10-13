@@ -20,12 +20,14 @@ void Ventilation::increment() {
     _currentSpeed = 300;
 
   setFreq(_currentSpeed);
+  start();
 
 }
 
 void Ventilation::stop(){
   _currentSpeed = 0;
   setFreq(_currentSpeed);
+  start();
 }
 
 void Ventilation::start(){
@@ -35,6 +37,7 @@ void Ventilation::start(){
 void Ventilation::restart(){
   _currentSpeed = 300;
   setFreq(_currentSpeed);
+  start();
 }
 
 uint16_t Ventilation::getSpeed() {

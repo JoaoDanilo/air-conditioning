@@ -52,10 +52,19 @@
  *   @param[in]  gpioName - GPIO;
  *               pin - pino do TPM Measure
  */
-mkl_RemoteControl::mkl_RemoteControl(gpio_Pin pin, PIT_ChPIT channel) {
+mkl_RemoteControl::mkl_RemoteControl(gpio_Pin pin, PIT_ChPIT channel, gpio_Pin whiteLed, gpio_Pin yellowLed) {
   _gpio = mkl_GPIOPort(pin);
   _gpio.setPortMode(gpio_input);
   _gpio.enableInterrupt(gpio_falling_edge);
+
+  _whiteLed = mkl_GPIOPort(whiteLed);
+  _whiteLed.setPortMode(gpio_output);
+  _whiteLed.writeBit(0);
+
+  _yellowLed = mkl_GPIOPort(yellowLed);
+  _yellowLed.setPortMode(gpio_output);
+  _yellowLed.writeBit(0);
+
 
   enableNVICInterrupt(pin);
   _pit = mkl_PITInterruptInterrupt(channel);
@@ -124,11 +133,7 @@ void mkl_RemoteControl::getBitStreamIR() {
       _newCommand = _bitStream;
       _pulseCount = 0;
       _flagCommandAvailable = true;
-
-      if(!_flagOverWrite)
-        _flagOverWrite = true;
-      else
-        _flagOverWrite = false;
+      _flagOverWrite = true;
 
     }
     else {
@@ -159,29 +164,30 @@ uint8_t mkl_RemoteControl::readCommand() {
 
   uint16_t command = bitShiftRight(_newCommand);
 
-
   return (command & 0xFF00) >> 8;
 }
 
 Exception_t mkl_RemoteControl::waitCommand() {
 
-  if(isParityError(_newCommand)){
+  if(isParityError(_newCommand)) {
     return mkl_parityError;
   }
-  else if(isOverWriteError()){
+  else if(isOverWriteError()) {
     return mkl_overWrite;
   }
+
+  _whiteLed.writeBit(0);
+  _yellowLed.writeBit(0);
 
   return mkl_ok;
 
 }
 
-bool mkl_RemoteControl::commandAvailable(){
+bool mkl_RemoteControl::commandAvailable() {
   return _flagCommandAvailable;
 }
 
 bool mkl_RemoteControl::isParityError(uint32_t value) {
-
 
   uint16_t command = bitShiftRight(value);
 
@@ -195,9 +201,9 @@ bool mkl_RemoteControl::isParityError(uint32_t value) {
   return false;
 }
 
-bool mkl_RemoteControl::isOverWriteError(){
+bool mkl_RemoteControl::isOverWriteError() {
 
-  if(!_flagOverWrite){
+  if(_flagOverWrite) {
     return true;
   }
   return false;
@@ -211,5 +217,15 @@ uint16_t mkl_RemoteControl::bitShiftRight(uint32_t value) {
   value |= (flag << 31);
 
   return value & 0x0000FFFF;
+}
+
+void mkl_RemoteControl::ledParityError() {
+  _whiteLed.writeBit(0);
+  _yellowLed.writeBit(1);
+}
+
+void mkl_RemoteControl::ledOverWriteError(){
+  _yellowLed.writeBit(0);
+  _whiteLed.writeBit(1);
 }
 

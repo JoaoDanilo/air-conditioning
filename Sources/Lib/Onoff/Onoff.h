@@ -11,7 +11,8 @@ class Onoff{
 
     void onOff();
     uint8_t read();
-    uint8_t ledStandby(uint8_t bit);
+    void activeLed();
+    void deactiveLed();
 
   private:
     mkl_GPIOPort _button;

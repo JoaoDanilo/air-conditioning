@@ -1,15 +1,19 @@
 #include "MinuteTimer.h"
 
-MinuteTimer::MinuteTimer(gpio_Pin incrementButton, gpio_Pin resetButton) {
+MinuteTimer::MinuteTimer(gpio_Pin incrementButton, gpio_Pin resetButton, gpio_Pin blueLed) {
 
 	_resetButton = mkl_GPIOPort(resetButton);
 	_incrementButton = mkl_GPIOPort(incrementButton);
+	_blueLed = mkl_GPIOPort(blueLed);
 
 	_incrementButton.setPortMode(gpio_input);
 	_incrementButton.setPullResistor(gpio_pullUpResistor);
 
 	_resetButton.setPortMode(gpio_input);
 	_resetButton.setPullResistor(gpio_pullUpResistor);
+
+	_blueLed.setPortMode(gpio_output);
+	_blueLed.writeBit(1);
 
 }
 
@@ -44,4 +48,12 @@ uint8_t MinuteTimer::readIncrementButton() {
 
 uint8_t MinuteTimer::readResetButton() {
 	return _resetButton.readBit();
+}
+
+void MinuteTimer::activeLed(){
+  _blueLed.writeBit(0);
+}
+
+void MinuteTimer::deactiveLed(){
+  _blueLed.writeBit(1);
 }

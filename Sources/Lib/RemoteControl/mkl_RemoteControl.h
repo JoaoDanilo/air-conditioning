@@ -64,7 +64,7 @@ class mkl_RemoteControl {
     /*!
      * M�todo construtor padr�o da classe.
      */
-    mkl_RemoteControl(gpio_Pin pin, PIT_ChPIT channel);
+    mkl_RemoteControl(gpio_Pin pin, PIT_ChPIT channel, gpio_Pin whiteLed, gpio_Pin yellowLed);
      /*!
      * M�todo de tratar e ler os dados do receptor IR.
      */
@@ -74,6 +74,8 @@ class mkl_RemoteControl {
     void getBitStreamIR();
     void incrementTime();
     bool commandAvailable();
+    void ledParityError();
+    void ledOverWriteError();
 
 
  private:
@@ -99,6 +101,8 @@ class mkl_RemoteControl {
     uint32_t _newCommand = 0;
     bool _flagCommandAvailable = false;
     bool _flagOverWrite = false;
+    mkl_GPIOPort _whiteLed;
+    mkl_GPIOPort _yellowLed;
 
 };
 #endif

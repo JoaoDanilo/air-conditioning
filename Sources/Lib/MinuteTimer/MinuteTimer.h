@@ -19,7 +19,7 @@ class MinuteTimer{
      * @param decrementButton - Pin related to the decrease of time
      * @param resetButton - Pin related to the reset time
      */
-    MinuteTimer(gpio_Pin incrementButton, gpio_Pin resetButton);
+    MinuteTimer(gpio_Pin incrementButton, gpio_Pin resetButton, gpio_Pin blueLed);
 
     /**
      * Increment time by 10
@@ -54,6 +54,12 @@ class MinuteTimer{
      */
     uint8_t readResetButton();
 
+    /**
+     * Actice Led while decrement counter
+     */
+    void activeLed();
+    void deactiveLed();
+
   private:
 
     /** Digital port associated with increment pin */
@@ -64,6 +70,9 @@ class MinuteTimer{
 
     /** Current time of controller */
     uint8_t _sleepTime = 0;
+
+    /** Digital port associated with Led counter */
+    mkl_GPIOPort _blueLed;
 };
 
 #endif

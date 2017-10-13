@@ -63,6 +63,7 @@ class mkl_TPMDelay : public mkl_TPM {
    * Construtor padr�o da classe.
    */
   explicit mkl_TPMDelay(tpm_TPMNumberMask pin);
+  explicit mkl_TPMDelay();
   /*!
    * M�todo de configura��o da classe.
    */

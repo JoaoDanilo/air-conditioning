@@ -60,6 +60,9 @@ mkl_TPMDelay::mkl_TPMDelay(tpm_TPMNumberMask tpmMask) {
   bindPeripheral(baseAddress);
   enablePeripheralClock(tpm);
 }
+mkl_TPMDelay::mkl_TPMDelay(){
+
+}
 
   /*!
    *   @fn       setFrequency
