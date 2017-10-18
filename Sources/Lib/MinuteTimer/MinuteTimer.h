@@ -60,6 +60,8 @@ class MinuteTimer{
     void activeLed();
     void deactiveLed();
 
+    void setTimer(uint8_t time);
+
   private:
 
     /** Digital port associated with increment pin */

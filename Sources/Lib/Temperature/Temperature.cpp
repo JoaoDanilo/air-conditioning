@@ -35,7 +35,7 @@ void Temperature::decrementProgTemp(){
 }
 
 void Temperature::resetProgTemp(){
-  _programTemp = 24;
+  _programTemp = 28;
 }
 
 void Temperature::getTemperature() {
