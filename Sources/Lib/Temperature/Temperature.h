@@ -9,6 +9,7 @@ class Temperature {
     void getTemperature();
     uint8_t readTemperature();
     uint8_t getProgTemp();
+    void setProgTemp(uint8_t temperature);
     void incrementProgTemp();
     void decrementProgTemp();
     void resetProgTemp();
@@ -17,7 +18,7 @@ class Temperature {
     mkl_TPMDelay _delay;
     uint8_t _counter = 0;
     uint8_t _temperature;
-    uint8_t _programTemp = 28;
+    uint8_t _programTemp = 24;
 
 };
 

@@ -46,6 +46,32 @@ extern "C" {
   }
 }
 
+int hexToDecimal(uint8_t hex){
+  switch(hex){
+    case 0x68:
+      return 0;
+    case 0x30:
+      return 1;
+    case 0x18:
+      return 2;
+    case 0x7A:
+      return 3;
+    case 0x10:
+      return 4;
+    case 0x5A:
+      return 6;
+    case 0x42:
+      return 7;
+    case 0x4A:
+      return 8;
+    case 0x52:
+      return 9;
+    default:
+      return 10;
+  }
+  return 10;
+}
+
 int main(void) {
 
   STATE s = STATE0;
@@ -57,6 +83,7 @@ int main(void) {
   volatile uint8_t ir;
   bool showDisplay;
   uint8_t resultMultiplex;
+  bool flag = true;
 
   while (true) {
 
@@ -64,14 +91,12 @@ int main(void) {
     display.updateDisplays();
     showDisplay = timer.getSleepTime() > 0 ? 0 : 1;
 
-    resultMultiplex = multiplex.select(showDisplay, timer.getSleepTime(),
-        temperature.getProgTemp());
+    resultMultiplex = multiplex.select(showDisplay, timer.getSleepTime(), temperature.getProgTemp());
 
     monoEstavel.startTimer();
     temperature.getTemperature();
 
-    control.controlCompressor(temperature.readTemperature(),
-        temperature.getProgTemp());
+    control.controlCompressor(temperature.readTemperature(), temperature.getProgTemp());
 
     monoEstavel.detectEdge(control.getSignal());
 
@@ -80,133 +105,22 @@ int main(void) {
       ir = remoteControl.readCommand();
       Exception_t error = remoteControl.waitCommand();
 
-      switch (ir) {
-        case 0x68:
-          if(!nibble1) {
+      int digitoIR = hexToDecimal(ir);
 
-          }
-          else if(!nibble2) {
-            nibble1 <<= 4;
-            nibble2 = (nibble1 | 0x0);
-            timer.setTimer(nibble2);
+      if (digitoIR < 10){
+        nibble1 = (timer.getSleepTime() % 10) << 4;
+        nibble2 = (nibble1 | digitoIR);
 
-            nibble1 = 0;
-            nibble2 = 0;
-          }
-          break;
-        case 0x30:
-          if(!nibble1) {
-            nibble1 = 1;
-            timer.setTimer(nibble1);
-          }
-          else if(!nibble2) {
-            nibble1 <<= 4;
-            nibble2 = (nibble1 | 1);
-            timer.setTimer(nibble2);
+        if (nibble2 != 0){
+          timer.setTimer(nibble2);
+        }
+        else{
+          s = STATE1;
+          timer.setTimer(0);
+        }
 
-            nibble1 = 0;
-            nibble2 = 0;
-          }
-          break;
-        case 0x18:
-          if(!nibble1) {
-            nibble1 = 2;
-            timer.setTimer(nibble1);
-          }
-          else if(!nibble2) {
-
-            nibble1 <<= 4;
-            nibble2 = (nibble1 | 2);
-            timer.setTimer(nibble2);
-
-            nibble1 = 0;
-            nibble2 = 0;
-          }
-          break;
-        case 0x7A:
-          if(!nibble1) {
-            nibble1 = 3;
-            timer.setTimer(nibble1);
-          }
-          else if(!nibble2) {
-            nibble1 <<= 4;
-            nibble2 = (nibble1 | 3);
-            timer.setTimer(nibble2);
-
-            nibble1 = 0;
-            nibble2 = 0;
-          }
-          break;
-        case 0x10:
-          if(!nibble1) {
-            nibble1 = 4;
-            timer.setTimer(nibble1);
-          }
-          else if(!nibble2) {
-            nibble1 <<= 4;
-            nibble2 = (nibble1 | 4);
-            timer.setTimer(nibble2);
-
-            nibble1 = 0;
-            nibble2 = 0;
-          }
-          break;
-        case 0x5A:
-          if(!nibble1) {
-            nibble1 = 6;
-            timer.setTimer(nibble1);
-          }
-          else if(!nibble2) {
-            nibble1 <<= 4;
-            nibble2 = (nibble1 | 6);
-            timer.setTimer(nibble2);
-
-            nibble1 = 0;
-            nibble2 = 0;
-          }
-          break;
-        case 0x42:
-          if(!nibble1) {
-            nibble1 = 7;
-            timer.setTimer(nibble1);
-          }
-          else if(!nibble2) {
-            nibble1 <<= 4;
-            nibble2 = (nibble1 | 7);
-            timer.setTimer(nibble2);
-
-            nibble1 = 0;
-            nibble2 = 0;
-          }
-          break;
-        case 0x4A:
-          if(!nibble1) {
-            nibble1 = 8;
-            timer.setTimer(nibble1);
-          }
-          else if(!nibble2) {
-            nibble1 <<= 4;
-            nibble2 = (nibble1 | 8);
-            timer.setTimer(nibble2);
-
-            nibble1 = 0;
-            nibble2 = 0;
-          }
-          break;
-        case 0x52:
-          if(!nibble1) {
-            nibble1 = 9;
-            timer.setTimer(nibble1);
-          }
-          else if(!nibble2) {
-            nibble1 <<= 4;
-            nibble2 = (nibble1 | 9);
-            timer.setTimer(nibble2);
-
-            nibble1 = 0;
-            nibble2 = 0;
-          }
-          break;
+        nibble1 = 0;
+        nibble2 = 0;
       }
 
       if(error != mkl_ok) {
@@ -234,6 +148,7 @@ int main(void) {
         if(ir == 0xA2) {
           s = STATE1;
           ventilator.restart();
+
         }
 
         if(!onoffButton.read()) {
@@ -256,6 +171,10 @@ int main(void) {
         }
         else {
           compressorLed.writeBit(0);
+        }
+
+        if(ir == 0x90){
+          temperature.setProgTemp(temperature.readTemperature());
         }
 
         if(ir == 0x62) {
@@ -310,6 +229,10 @@ int main(void) {
         }
         else {
           compressorLed.writeBit(0);
+        }
+
+        if(ir == 0x90){
+          temperature.setProgTemp(temperature.readTemperature());
         }
 
         if(!timer.getSleepTime()) {

@@ -18,6 +18,10 @@ uint8_t Temperature::getProgTemp(){
   return _programTemp;
 }
 
+void Temperature::setProgTemp(uint8_t temperature){
+  _programTemp = temperature;
+}
+
 void Temperature::incrementProgTemp(){
   _programTemp++;
 
@@ -35,7 +39,7 @@ void Temperature::decrementProgTemp(){
 }
 
 void Temperature::resetProgTemp(){
-  _programTemp = 28;
+  _programTemp = 24;
 }
 
 void Temperature::getTemperature() {
